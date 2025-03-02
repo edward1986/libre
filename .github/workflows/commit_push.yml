@@ -1,0 +1,37 @@
+name: Install LibreOffice and Commit Changes
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  install_and_commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Package List
+        run: sudo apt update
+
+      - name: Install LibreOffice
+        run: sudo apt install -y libreoffice
+
+      - name: Verify LibreOffice Installation
+        run: libreoffice --version > libreoffice_version.txt
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Commit Changes
+        run: |
+          git add libreoffice_version.txt
+          git commit -m "Updated LibreOffice version info"
+          git push origin main
